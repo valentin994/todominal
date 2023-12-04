@@ -13,8 +13,8 @@ impl Display for Todo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "○ {} \t\tID: {} \n  ->priority: {}\n",
-            self.todo_text, self.id, self.priority
+            "ID: {}\n○ {}\n  ->priority: {}\n",
+            self.id, self.todo_text, self.priority
         )
     }
 }
