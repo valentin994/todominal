@@ -3,13 +3,13 @@ use rusqlite::{Connection, Error, Result};
 use std::fmt::Display;
 use std::fmt;
 
-//TODO Add a way to fetch all todos
 //TODO Change code to use Subcommands
 //TODO A way to remove the todo
 //TODO A way to check on which operating system I am and how to store the todo
 //TODO A way to reorganize the todos
 //TODO Add colors for priorities
 //TODO Add a config to be able to change the colors, specify file location for the sqlite
+//TODO implement ratatui into this
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -92,7 +92,7 @@ struct Todo {
 
 impl Display for Todo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}. {} priority: {}",self.id,self.todo_text,self.priority)
+        write!(f, "○ {} \n\t->priority: {}\n", self.todo_text,self.priority)
     }
 }
 
