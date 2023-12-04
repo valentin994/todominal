@@ -1,10 +1,10 @@
 use ::clap::{Parser, ValueEnum};
-use rusqlite::{Connection, Error, Result};
-use std::fmt::Display;
+use rusqlite::{params, Connection, Error, Result};
 use std::fmt;
+use std::fmt::Display;
 
+//TODO A way to update the todo
 //TODO Change code to use Subcommands
-//TODO A way to remove the todo
 //TODO A way to check on which operating system I am and how to store the todo
 //TODO A way to reorganize the todos
 //TODO Add colors for priorities
@@ -20,6 +20,8 @@ struct Args {
     text: String,
     #[arg(short, long, default_value = "medium")]
     priority: String,
+    #[arg(short, long, default_value = None)]
+    id: Option<i32>,
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
 enum Operation {
@@ -53,19 +55,13 @@ fn insert_todo(conn: Connection, todo_text: String, priority: String) -> Result<
     Ok(())
 }
 
-fn remove_todo(conn: Connection, todo_text: String, priority: String) -> Result<(), Error> {
-    conn.execute(
-        "INSERT into todo (todo_text, priority) VALUES (?1, ?2)",
-        (todo_text, priority),
-    )?;
+fn remove_todo(conn: Connection, id: i32) -> Result<(), Error> {
+    conn.execute("DELETE from todo where id = ?", ([&id]))?;
     Ok(())
 }
 
 fn modify_todo(conn: Connection, todo_text: String, priority: String) -> Result<(), Error> {
-    conn.execute(
-        "INSERT into todo (todo_text, priority) VALUES (?1, ?2)",
-        (todo_text, priority),
-    )?;
+    let mut stms = conn.prepare("DELETE from todo where id = VALUES (?1)")?;
     Ok(())
 }
 
@@ -92,7 +88,11 @@ struct Todo {
 
 impl Display for Todo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "○ {} \n\t->priority: {}\n", self.todo_text,self.priority)
+        write!(
+            f,
+            "○ {} \t\tID: {} \n  ->priority: {}\n",
+            self.todo_text, self.id, self.priority
+        )
     }
 }
 
@@ -104,7 +104,10 @@ fn main() {
             insert_todo(conn, args.text, args.priority);
         }
         Operation::Remove => {
-            remove_todo(conn, args.text, args.priority);
+            match remove_todo(conn, args.id.unwrap()) {
+                Ok(()) => (),
+                Err(err) => println!("{err}"),
+            };
         }
         Operation::Modify => {
             modify_todo(conn, args.text, args.priority);
