@@ -1,10 +1,16 @@
 mod crud;
+
+use std::any::Any;
+use std::error::Error;
+use std::fmt::Debug;
 use crud::{get_all_todos, insert_todo, modify_todo, remove_todo};
+use std::fs;
+use std::path::Path;
 
 use ::clap::{Parser, ValueEnum};
+use directories::ProjectDirs;
 use rusqlite::{Connection, Error, Result};
-
-//TODO Cleanup and file separation
+use rusqlite::Error::{SqlInputError, NulError};
 //TODO A way to update the todo
 //TODO Change code to use Subcommands
 //TODO A way to check on which operating system I am and how to store the todo
@@ -34,8 +40,29 @@ enum Operation {
 }
 
 fn create_table() -> Result<Connection, Error> {
-    let path = "./my_db.db3";
-    let db = Connection::open(path)?;
+    if let Some(proj_dirs) = ProjectDirs::from("", "", "todominal") {
+        fs::create_dir_all(proj_dirs.config_dir()).expect("Unable to create the dir");
+        let path = proj_dirs.config_dir().join(Path::new("my_db.db3"));
+        let db = Connection::open(path)?;
+        match db.execute(
+            "CREATE TABLE todo (
+         id INTEGER PRIMARY KEY AUTOINCREMENT,
+         todo_text  TEXT NOT NULL,
+         priority  TEXT
+     )",
+            (), // empty list of parameters.
+        ) {
+            Ok(_) => (),
+            Err(err) => {
+                println!("{:?} {:?}", err.kind(), err.sqlite_error())
+            }
+            _ => println!("test")
+        };
+
+        Ok(db)
+    } else {
+        panic!("Unable to connect to the database");
+    }
     // Use the database somehow...
     /* db.execute(
         "CREATE TABLE todo (
@@ -45,8 +72,6 @@ fn create_table() -> Result<Connection, Error> {
         )",
         (), // empty list of parameters.
     )?;*/
-
-    Ok(db)
 }
 
 fn main() {
