@@ -27,16 +27,24 @@ impl Display for Todo {
     }
 }
 
-pub fn insert_todo(conn: Connection, todo_text: String, priority: String) -> Result<(), Error> {
+pub fn insert_todo(conn: Connection, todo_text: Option<String>, priority: String) -> Result<(), Error> {
+    let text = match todo_text {
+        Some(x) => x,
+        None => panic!("Please provide a valid string"),
+    };
     conn.execute(
         "INSERT into todo (todo_text, priority, date) VALUES (?1, ?2, DATE('now'))",
-        (todo_text, priority),
+        (text, priority),
     )?;
     Ok(())
 }
 
-pub fn remove_todo(conn: Connection, id: i32) -> Result<(), Error> {
-    conn.execute("DELETE from todo where id = ?", [&id])?;
+pub fn remove_todo(conn: Connection, id: Option<i32>) -> Result<(), Error> {
+    let _id = match id {
+        Some(id_value) => id_value,
+        None => panic!("Please provide a valid ID value")
+    };
+    conn.execute("DELETE from todo where id = ?", [_id])?;
     Ok(())
 }
 

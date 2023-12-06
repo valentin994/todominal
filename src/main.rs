@@ -21,8 +21,8 @@ use rusqlite::{Connection, Result};
 struct Args {
     #[arg(value_enum)]
     operation: Operation,
-    #[arg(short, long, default_value = " ")]
-    text: String,
+    #[arg(short, long)]
+    text: Option<String>,
     #[arg(short, long, default_value = "medium")]
     priority: String,
     #[arg(short, long, default_value = None)]
@@ -73,7 +73,7 @@ fn main() {
             };
         }
         Operation::Remove => {
-            match remove_todo(conn, args.id.unwrap()) {
+            match remove_todo(conn, args.id) {
                 Ok(()) => (),
                 Err(err) => println!("{err}"),
             };
