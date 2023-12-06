@@ -15,7 +15,7 @@ impl Display for Todo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "ID: {id}\n○ {text:<20} {date:>20}\n  ->priority: {priority}\n",
+            "ID: {id}\n○ {text:<30} {date:>30}\n  ->priority: {priority}\n",
             id=self.id,
             text=self.todo_text,
             date=NaiveDate::parse_from_str(&self.date, "%Y-%m-%d")
