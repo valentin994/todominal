@@ -53,7 +53,8 @@ fn create_table() -> Result<Connection, rusqlite::Error> {
             "CREATE TABLE todo (
          id INTEGER PRIMARY KEY AUTOINCREMENT,
          todo_text  TEXT NOT NULL,
-         priority  TEXT
+         priority  TEXT,
+         date      TEXT
      )",
             (),
         )?;

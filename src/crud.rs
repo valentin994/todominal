@@ -1,3 +1,4 @@
+use chrono::NaiveDate;
 use rusqlite::{Connection, Error, Result};
 use std::fmt;
 use std::fmt::Display;
@@ -7,21 +8,28 @@ struct Todo {
     id: u16,
     todo_text: String,
     priority: String,
+    date: String,
 }
 
 impl Display for Todo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "ID: {}\n○ {}\n  ->priority: {}\n",
-            self.id, self.todo_text, self.priority
+            "ID: {id}\n○ {text:<20} {date:>20}\n  ->priority: {priority}\n",
+            id=self.id,
+            text=self.todo_text,
+            date=NaiveDate::parse_from_str(&self.date, "%Y-%m-%d")
+                .unwrap()
+                .format("%d-%m-%Y")
+                .to_string(),
+            priority=self.priority,
         )
     }
 }
 
 pub fn insert_todo(conn: Connection, todo_text: String, priority: String) -> Result<(), Error> {
     conn.execute(
-        "INSERT into todo (todo_text, priority) VALUES (?1, ?2)",
+        "INSERT into todo (todo_text, priority, date) VALUES (?1, ?2, DATE('now'))",
         (todo_text, priority),
     )?;
     Ok(())
@@ -44,6 +52,7 @@ pub fn get_all_todos(conn: Connection) -> Result<(), Error> {
             id: row.get(0)?,
             todo_text: row.get(1)?,
             priority: row.get(2)?,
+            date: row.get(3)?,
         })
     })?;
     for todo in todo_iter {
