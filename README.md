@@ -9,3 +9,5 @@ To build from source run
 
 - `cargo build --release`
 - The executable is in `target/release/todominal`
+
+### TODO - Explpain functionalities and planned features 
