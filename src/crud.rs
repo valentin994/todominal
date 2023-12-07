@@ -16,20 +16,24 @@ impl Display for Todo {
         write!(
             f,
             "ID: {id}\n○ {text:<30} {date:>30}\n  ->priority: {priority}\n",
-            id=self.id,
-            text=self.todo_text,
-            date=NaiveDate::parse_from_str(&self.date, "%Y-%m-%d")
+            id = self.id,
+            text = self.todo_text,
+            date = NaiveDate::parse_from_str(&self.date, "%Y-%m-%d")
                 .unwrap()
                 .format("%d-%m-%Y")
                 .to_string(),
-            priority=self.priority,
+            priority = self.priority,
         )
     }
 }
 
-pub fn insert_todo(conn: Connection, todo_text: Option<String>, priority: String) -> Result<(), Error> {
+pub fn insert_todo(
+    conn: Connection,
+    todo_text: Option<String>,
+    priority: String,
+) -> Result<(), Error> {
     let text = match todo_text {
-        Some(x) => x,
+        Some(text) => text,
         None => panic!("Please provide a valid string"),
     };
     conn.execute(
@@ -40,16 +44,29 @@ pub fn insert_todo(conn: Connection, todo_text: Option<String>, priority: String
 }
 
 pub fn remove_todo(conn: Connection, id: Option<i32>) -> Result<(), Error> {
-    let _id = match id {
-        Some(id_value) => id_value,
-        None => panic!("Please provide a valid ID value")
+    let id = match id {
+        Some(id) => id,
+        None => panic!("Please provide a valid ID value"),
     };
-    conn.execute("DELETE from todo where id = ?", [_id])?;
+    conn.execute("DELETE from todo where id = ?", [id])?;
     Ok(())
 }
 
-pub fn modify_todo(conn: Connection) -> Result<(), Error> {
-    conn.prepare("DELETE from todo where id = VALUES (?1)")?;
+pub fn modify_todo(conn: Connection, id: Option<i32>, text: Option<String>) -> Result<(), Error> {
+    let id = match id {
+        Some(id) => id,
+        None => panic!("ID does not exist"),
+    };
+    let text = match text {
+        Some(text) => text,
+        None => panic!("Please provide valid text"),
+    };
+    conn.execute(
+        "UPDATE todo \
+                      set todo_text = ? \
+                      WHERE id = ?;",
+        (text, id),
+    )?;
     Ok(())
 }
 

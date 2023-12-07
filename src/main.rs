@@ -79,7 +79,7 @@ fn main() {
             };
         }
         Operation::Modify => {
-            match modify_todo(conn) {
+            match modify_todo(conn, args.id, args.text) {
                 Ok(()) => (),
                 Err(err) => println!("{err}"),
             };
