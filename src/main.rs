@@ -1,4 +1,5 @@
 mod crud;
+mod args;
 
 use crud::{get_all_todos, insert_todo, modify_todo, remove_todo};
 use std::fmt::Debug;
@@ -6,6 +7,7 @@ use std::fs;
 use std::path::Path;
 
 use ::clap::{Parser, ValueEnum};
+use clap::Subcommand;
 use directories::ProjectDirs;
 use rusqlite::{Connection, Result};
 //TODO A way to update the todo
@@ -15,7 +17,7 @@ use rusqlite::{Connection, Result};
 //TODO Add colors for priorities
 //TODO Add a config to be able to change the colors, specify file location for the sqlite
 //TODO implement ratatui into this
-
+//TODO try the palette crate for terminal color
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -28,7 +30,7 @@ struct Args {
     #[arg(short, long, default_value = None)]
     id: Option<i32>,
 }
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug, Subcommand)]
 enum Operation {
     Add,
     Remove,
