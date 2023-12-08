@@ -3,7 +3,7 @@ use clap::{Args, Parser, Subcommand};
 #[clap(author, version, about)]
 pub struct TodominalArgs {
     #[clap(subcommand)]
-    pub crud: CrudCommand, 
+    pub crud: CrudCommand,
     //create a config subcommand
 }
 
@@ -36,16 +36,14 @@ pub struct AddTodo {
 #[derive(Args, Debug)]
 pub struct RemoveTodo {
     /// The id of the todo
-    pub id: i32
+    pub id: i32,
 }
 
 #[derive(Args, Debug)]
 pub struct ModifyTodo {
     /// The id of the todo
     pub id: i32,
-    
+
     /// The text to update the todo with
-    pub text: String
+    pub text: String,
 }
-
-

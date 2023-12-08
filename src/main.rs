@@ -79,20 +79,19 @@ fn main() {
                 Ok(added_todo) => println!("Added Todo: {}", added_todo),
                 Err(err) => println!("Unable to add the todo"),
             };
-        },
+        }
         CrudCommand::Remove(todo) => {
             match remove_todo(conn, todo.id) {
                 Ok(result) => println!("{result}"),
                 Err(err) => println!("{err}"),
             };
-        },
+        }
         CrudCommand::Modify(todo) => {
             match modify_todo(conn, todo.id, todo.text) {
                 Ok(modified_todo) => println!("{modified_todo}"),
                 Err(err) => println!("{err}"),
             };
-
-        },
+        }
         CrudCommand::List => {
             match get_all_todos(conn) {
                 Ok(()) => (),
