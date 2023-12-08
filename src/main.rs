@@ -1,15 +1,18 @@
-mod crud;
 mod args;
+mod crud;
 
+use args::TodominalArgs;
 use crud::{get_all_todos, insert_todo, modify_todo, remove_todo};
 use std::fmt::Debug;
 use std::fs;
 use std::path::Path;
 
+use crate::args::CrudCommand;
 use ::clap::{Parser, ValueEnum};
 use clap::Subcommand;
 use directories::ProjectDirs;
 use rusqlite::{Connection, Result};
+
 //TODO A way to update the todo
 //TODO Change code to use Subcommands
 //TODO A way to check on which operating system I am and how to store the todo
@@ -18,6 +21,9 @@ use rusqlite::{Connection, Result};
 //TODO Add a config to be able to change the colors, specify file location for the sqlite
 //TODO implement ratatui into this
 //TODO try the palette crate for terminal color
+//TODO enable deleting multiple todos with a flag
+//TODO enable filtering on list
+
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -66,31 +72,33 @@ fn create_table() -> Result<Connection, rusqlite::Error> {
 
 fn main() {
     let conn = create_table().expect("Failed to connect to the DB");
-    let args = Args::parse();
-    match args.operation {
-        Operation::Add => {
-            match insert_todo(conn, args.text, args.priority) {
-                Ok(()) => (),
-                Err(err) => println!("Problems with adding the todo {}", err),
+    let args = TodominalArgs::parse();
+    match args.crud {
+        CrudCommand::Add(todo) => {
+            match insert_todo(conn, todo.text, todo.priority) {
+                Ok(added_todo) => println!("Added Todo: {}", added_todo),
+                Err(err) => println!("Unable to add the todo"),
             };
-        }
-        Operation::Remove => {
-            match remove_todo(conn, args.id) {
-                Ok(()) => (),
+        },
+        CrudCommand::Remove(todo) => {
+            match remove_todo(conn, todo.id) {
+                Ok(result) => println!("{result}"),
                 Err(err) => println!("{err}"),
             };
-        }
-        Operation::Modify => {
-            match modify_todo(conn, args.id, args.text) {
-                Ok(()) => (),
+        },
+        CrudCommand::Modify(todo) => {
+            match modify_todo(conn, todo.id, todo.text) {
+                Ok(modified_todo) => println!("{modified_todo}"),
                 Err(err) => println!("{err}"),
             };
-        }
-        Operation::Ls => {
+
+        },
+        CrudCommand::List => {
             match get_all_todos(conn) {
                 Ok(()) => (),
                 Err(err) => println!("{err}"),
             };
         }
+        _ => println!("doing something else"),
     }
 }

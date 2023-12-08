@@ -27,47 +27,27 @@ impl Display for Todo {
     }
 }
 
-pub fn insert_todo(
-    conn: Connection,
-    todo_text: Option<String>,
-    priority: String,
-) -> Result<(), Error> {
-    let text = match todo_text {
-        Some(text) => text,
-        None => panic!("Please provide a valid string"),
-    };
+pub fn insert_todo(conn: Connection, todo_text: String, priority: String) -> Result<String, Error> {
     conn.execute(
         "INSERT into todo (todo_text, priority, date) VALUES (?1, ?2, DATE('now'))",
-        (text, priority),
+        (&todo_text, priority),
     )?;
-    Ok(())
+    Ok(String::from(format!("{todo_text}")))
 }
 
-pub fn remove_todo(conn: Connection, id: Option<i32>) -> Result<(), Error> {
-    let id = match id {
-        Some(id) => id,
-        None => panic!("Please provide a valid ID value"),
-    };
+pub fn remove_todo(conn: Connection, id: i32) -> Result<String, Error> {
     conn.execute("DELETE from todo where id = ?", [id])?;
-    Ok(())
+    Ok(String::from("Done"))
 }
 
-pub fn modify_todo(conn: Connection, id: Option<i32>, text: Option<String>) -> Result<(), Error> {
-    let id = match id {
-        Some(id) => id,
-        None => panic!("ID does not exist"),
-    };
-    let text = match text {
-        Some(text) => text,
-        None => panic!("Please provide valid text"),
-    };
+pub fn modify_todo(conn: Connection, id: i32, text: String) -> Result<String, Error> {
     conn.execute(
         "UPDATE todo \
                       set todo_text = ? \
                       WHERE id = ?;",
-        (text, id),
+        (&text, &id),
     )?;
-    Ok(())
+    Ok(String::from(format!("Changed Todo: {id}, to be: {text}")))
 }
 
 pub fn get_all_todos(conn: Connection) -> Result<(), Error> {
