@@ -13,6 +13,7 @@ use clap::Subcommand;
 use directories::ProjectDirs;
 use rusqlite::{Connection, Result};
 
+//TODO move the db initialization to a build step
 //TODO A way to update the todo
 //TODO Change code to use Subcommands
 //TODO A way to check on which operating system I am and how to store the todo
