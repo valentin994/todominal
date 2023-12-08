@@ -77,7 +77,7 @@ fn main() {
         CrudCommand::Add(todo) => {
             match insert_todo(conn, todo.text, todo.priority) {
                 Ok(added_todo) => println!("Added Todo: {}", added_todo),
-                Err(err) => println!("Unable to add the todo"),
+                Err(err) => println!("Unable to add the todo {}", err),
             };
         }
         CrudCommand::Remove(todo) => {
@@ -98,6 +98,5 @@ fn main() {
                 Err(err) => println!("{err}"),
             };
         }
-        _ => println!("doing something else"),
     }
 }
