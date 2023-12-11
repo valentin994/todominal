@@ -20,7 +20,7 @@ pub enum CrudCommand {
     Modify(ModifyTodo),
     /// List all todos
     #[clap(alias = "ls")]
-    List,
+    List(ListTodo),
 }
 
 #[derive(Args, Debug)]
@@ -32,6 +32,14 @@ pub struct AddTodo {
     #[arg(short, long, default_value = "medium")]
     pub priority: String,
 }
+
+#[derive(Args, Debug)]
+pub struct ListTodo {
+    /// The priority of the todo
+    #[arg(short, long)]
+    pub priority: Option<String>,
+}
+
 
 #[derive(Args, Debug)]
 pub struct RemoveTodo {

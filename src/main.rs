@@ -3,20 +3,14 @@ mod crud;
 
 use args::TodominalArgs;
 use crud::{get_all_todos, insert_todo, modify_todo, remove_todo};
-use std::fmt::Debug;
 use std::fs;
 use std::path::Path;
 
 use crate::args::CrudCommand;
 use ::clap::{Parser, ValueEnum};
-use clap::Subcommand;
 use directories::ProjectDirs;
 use rusqlite::{Connection, Result};
 
-//TODO move the db initialization to a build step
-//TODO A way to update the todo
-//TODO Change code to use Subcommands
-//TODO A way to check on which operating system I am and how to store the todo
 //TODO A way to reorganize the todos
 //TODO Add colors for priorities
 //TODO Add a config to be able to change the colors, specify file location for the sqlite
@@ -24,26 +18,6 @@ use rusqlite::{Connection, Result};
 //TODO try the palette crate for terminal color
 //TODO enable deleting multiple todos with a flag
 //TODO enable filtering on list
-
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    #[arg(value_enum)]
-    operation: Operation,
-    #[arg(short, long)]
-    text: Option<String>,
-    #[arg(short, long, default_value = "medium")]
-    priority: String,
-    #[arg(short, long, default_value = None)]
-    id: Option<i32>,
-}
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug, Subcommand)]
-enum Operation {
-    Add,
-    Remove,
-    Modify,
-    Ls,
-}
 
 fn create_table() -> Result<Connection, rusqlite::Error> {
     let proj_dirs = ProjectDirs::from("", "", "todominal");
@@ -93,8 +67,8 @@ fn main() {
                 Err(err) => println!("{err}"),
             };
         }
-        CrudCommand::List => {
-            match get_all_todos(conn) {
+        CrudCommand::List(params) => {
+            match get_all_todos(conn, params.priority) {
                 Ok(()) => (),
                 Err(err) => println!("{err}"),
             };

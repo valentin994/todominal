@@ -50,8 +50,10 @@ pub fn modify_todo(conn: Connection, id: i32, text: String) -> Result<String, Er
     Ok(String::from(format!("Changed Todo: {id}, to be: {text}")))
 }
 
-pub fn get_all_todos(conn: Connection) -> Result<(), Error> {
-    let mut statement = conn.prepare("SELECT * FROM todo")?;
+pub fn get_all_todos(conn: Connection, filter: Option<String>) -> Result<(), Error> {
+    let filter_query = filter.map(|i| format!(" WHERE priority = '{}'", i)).unwrap_or_default();
+    let query = format!("SELECT id, todo_text, priority, date FROM todo{}", filter_query);
+    let mut statement = conn.prepare(&query)?;
     let todo_iter = statement.query_map([], |row| {
         Ok(Todo {
             id: row.get(0)?,
