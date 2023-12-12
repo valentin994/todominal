@@ -7,12 +7,9 @@ use crud::{create_table, get_all_todos, insert_todo, modify_todo, remove_todo};
 use crate::args::CrudCommand;
 use ::clap::Parser;
 
-//TODO A way to reorganize the todos
 //TODO Add colors for priorities
 //TODO Add a config to be able to change the colors, specify file location for the sqlite
 //TODO implement ratatui into this
-//TODO try the palette crate for terminal color
-//TODO enable deleting multiple todos with a flag
 //TODO enable filtering on list
 //TODO filter by date
 //TODO ascending and descending
