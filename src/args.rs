@@ -40,7 +40,6 @@ pub struct ListTodo {
     pub priority: Option<String>,
 }
 
-
 #[derive(Args, Debug)]
 pub struct RemoveTodo {
     /// The id of the todo

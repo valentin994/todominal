@@ -2,14 +2,10 @@ mod args;
 mod crud;
 
 use args::TodominalArgs;
-use crud::{get_all_todos, insert_todo, modify_todo, remove_todo};
-use std::fs;
-use std::path::Path;
+use crud::{create_table, get_all_todos, insert_todo, modify_todo, remove_todo};
 
 use crate::args::CrudCommand;
-use ::clap::{Parser, ValueEnum};
-use directories::ProjectDirs;
-use rusqlite::{Connection, Result};
+use ::clap::Parser;
 
 //TODO A way to reorganize the todos
 //TODO Add colors for priorities
@@ -18,35 +14,11 @@ use rusqlite::{Connection, Result};
 //TODO try the palette crate for terminal color
 //TODO enable deleting multiple todos with a flag
 //TODO enable filtering on list
-
-fn create_table() -> Result<Connection, rusqlite::Error> {
-    let proj_dirs = ProjectDirs::from("", "", "todominal");
-    let path = proj_dirs
-        .clone()
-        .unwrap()
-        .config_dir()
-        .join(Path::new("todominal.db3"));
-    if path.exists() {
-        let db = Connection::open(path)?;
-        return Ok(db);
-    } else {
-        let _ = fs::create_dir_all(proj_dirs.clone().unwrap().config_dir());
-        let db = Connection::open(path)?;
-        let _ = db.execute(
-            "CREATE TABLE todo (
-         id INTEGER PRIMARY KEY AUTOINCREMENT,
-         todo_text  TEXT NOT NULL,
-         priority  TEXT,
-         date      TEXT
-     )",
-            (),
-        )?;
-        return Ok(db);
-    }
-}
+//TODO filter by date
+//TODO ascending and descending
 
 fn main() {
-    let conn = create_table().expect("Failed to connect to the DB");
+    let conn = create_table().unwrap();
     let args = TodominalArgs::parse();
     match args.crud {
         CrudCommand::Add(todo) => {

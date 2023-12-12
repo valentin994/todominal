@@ -1,8 +1,10 @@
 use chrono::NaiveDate;
+use directories::ProjectDirs;
 use rusqlite::{Connection, Error, Result};
 use std::fmt;
 use std::fmt::Display;
-
+use std::fs;
+use std::path::Path;
 #[derive(Debug)]
 struct Todo {
     id: u16,
@@ -51,8 +53,13 @@ pub fn modify_todo(conn: Connection, id: i32, text: String) -> Result<String, Er
 }
 
 pub fn get_all_todos(conn: Connection, filter: Option<String>) -> Result<(), Error> {
-    let filter_query = filter.map(|i| format!(" WHERE priority = '{}'", i)).unwrap_or_default();
-    let query = format!("SELECT id, todo_text, priority, date FROM todo{}", filter_query);
+    let filter_query = filter
+        .map(|i| format!(" WHERE priority = '{}'", i))
+        .unwrap_or_default();
+    let query = format!(
+        "SELECT id, todo_text, priority, date FROM todo{}",
+        filter_query
+    );
     let mut statement = conn.prepare(&query)?;
     let todo_iter = statement.query_map([], |row| {
         Ok(Todo {
@@ -66,4 +73,29 @@ pub fn get_all_todos(conn: Connection, filter: Option<String>) -> Result<(), Err
         println!("{}", todo.unwrap());
     }
     Ok(())
+}
+
+pub fn create_table() -> Result<Connection, rusqlite::Error> {
+    let proj_dirs = ProjectDirs::from("", "", "todominal");
+    let path = proj_dirs
+        .clone()
+        .unwrap()
+        .config_dir()
+        .join(Path::new("todominal.db3"));
+    return if path.exists() {
+        Ok(Connection::open(path)?)
+    } else {
+        let _ = fs::create_dir_all(proj_dirs.clone().unwrap().config_dir());
+        let db = Connection::open(path)?;
+        let _ = db.execute(
+            "CREATE TABLE todo (
+         id INTEGER PRIMARY KEY AUTOINCREMENT,
+         todo_text  TEXT NOT NULL,
+         priority  TEXT,
+         date      TEXT
+     )",
+            (),
+        )?;
+        return Ok(db);
+    };
 }
