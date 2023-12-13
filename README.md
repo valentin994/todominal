@@ -10,4 +10,5 @@ Location for the database:
 
 To build and run the application
 - ` cargo install --path . && todominal`
-### TODO - Explpain functionalities and planned features 
+- 
+### TODO - Explain functionalities and planned features 
