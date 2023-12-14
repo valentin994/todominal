@@ -10,5 +10,9 @@ Location for the database:
 
 To build and run the application
 - ` cargo install --path . && todominal`
-- 
-### TODO - Explain functionalities and planned features 
+
+## Operations
+### Add
+This adds a todo with a provided text to the sqlite database. 
+The priority is set to medium by but you can provide any arbitrary value to that flag. 
+`todominal add "My new todo --priority "high"`
